@@ -1,0 +1,163 @@
+<!--
+/*********************************************************************************
+* ITC5202 – Project
+* I declare that this assignment is my own work in accordance with Humber Academic Policy. 
+* No part of this assignment has been copied manually or electronically from any other source
+* (including web sites) or distributed to other students.
+* 
+* Group member Name: Bharat Raj Verma, Sanath Tulli Student IDs: N01510841, N01473612 Date: 8/8/2022
+*
+*
+********************************************************************************/
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Reddit Article</title>
+    <style>
+        .header {
+            text-align: center;
+            font-size: 15px;
+            background: linear-gradient(to right, rgb(78, 78, 78), white, rgb(68, 68, 68));
+        }
+        
+        body {
+            background-color: rgb(68, 68, 68);
+            font-family: cursive;
+            font-size: 90%;
+            font-style: italic;
+            font-weight: 600;
+        }
+        
+        h3 {
+            text-align: center;
+        }
+        
+        #headerhr {
+            width: 60%;
+            height: 10px;
+            border-width: 1px;
+            background-color: rgb(61, 61, 61);
+        }
+        
+        #btn {
+            background-color: black;
+            color: white;
+            width: 40%;
+        }
+        
+        .card {
+            text-align: center;
+            background: linear-gradient(to right, rgb(193, 193, 193), white, rgb(167, 167, 167));
+        }
+        
+        .mainouter {
+            margin: 0 10% 0 10%;
+        }
+        
+        .col-sm-4 {
+            transition: transform .5s;
+        }
+        
+        .col-sm-4:hover {
+            -ms-transform: scale(1.1);
+            /* IE 9 */
+            -webkit-transform: scale(1.1);
+            /* Safari 3-8 */
+            transform: scale(1.1);
+        }
+        
+        .seachheader {
+            background-image: linear-gradient(to right, rgb(71, 71, 71), rgb(35, 35, 35), rgb(41, 41, 41), rgb(29, 29, 29), rgb(35, 35, 35), rgb(101, 101, 101));
+            margin: 10px;
+            color: whitesmoke;
+        }
+        
+        .box {
+            background-color: darkgray;
+        }
+    </style>
+    <!-- step 1: jQuery CDN to the project-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <hr id="headerhr">
+    <div class="header">
+        <br>
+        <form action="#" name="SearchForm">
+            <div class="seachheader">
+                <label id="sr">Search Reddit</label><br>
+            </div>
+            <input id="search" type="text"><br><br>
+            <label>Sort By: </label><br> Relevance
+            <input type="radio" name="radio" value="relevance"> <br> Latest
+            <input type="radio" name="radio" value="new">
+            <br><br>
+            <label>Limit</label><br>
+            <input id="limit" type="text"><br><br>
+            <input type="button" value="Search" id='btn' onclick=getArticle()>
+        </form>
+        <br> <br>
+    </div>
+    <hr id="headerhr">
+
+
+    <p id="locs"></p>
+    <script>
+        function getArticle() { 
+            if ((!$("input[name='radio']:checked").val())|| (!$("#search").val()) || (!$("#limit").val())) {
+                alert('PLease fill all details');
+                return false;
+            }
+            else{
+                var sortValue = $('input[name="radio"]:checked').val();
+                var subreddit = $("#search").val();
+                var limit = $("#limit").val();
+            }
+            output = "<div class='mainouter'>";
+            output += "<div class='row'>";
+
+            $.getJSON(`https://www.reddit.com/search.json?q=${subreddit}&limit=${limit}&sort=${sortValue}`, function(data) {
+                $.each(data.data.children, function(i, item) {
+
+                    let image = item.data.preview ?
+                        item.data.preview.images[0].source.url :
+                        'https://cdn.comparitech.com/wp-content/uploads/2017/08/reddit-1.jpg';
+                    if (i % 3 == 0) {
+                        output += "</div><div class='row'>";
+                    }
+                    var readMoreURL = "https://www.reddit.com"+item.data.permalink;
+                    output += `
+                    <div class="col-sm-4">
+                        <div class="card text-right">
+                            <img class="card-img-top" src="${image}" alt="Card image cap" height=200px width=300px>
+                            <div class="card-body">
+                                 <h5 class="card-title">${item.data.title}</h5>
+                                <a href="${readMoreURL}" target="_blank " class="btn btn-primary">Read More</a><br>
+                                <span class="badge badge-secondary">Subreddit: ${item.data.subreddit}</span><br>
+                                <span class="badge badge-dark">Score: ${item.data.score}</span>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                });
+                output += "</div>";
+                $("#locs").html(output);
+            })
+            .fail(function() { 
+                output = "<h3>Sorry, an error occurred while processing your request. Please check the API URL";
+                $("#locs").html(output);
+            })
+        }
+    </script>
+</body>
+
+</html>

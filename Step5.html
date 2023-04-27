@@ -1,0 +1,114 @@
+<!--
+/*********************************************************************************
+* ITC5202 – Project
+* I declare that this assignment is my own work in accordance with Humber Academic Policy. 
+* No part of this assignment has been copied manually or electronically from any other source
+* (including web sites) or distributed to other students.
+* 
+* Group member Name: Bharat Raj Verma, Sanath Tulli Student IDs: N01510841, N01473612 Date: 8/8/2022
+*
+*
+********************************************************************************/
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddit Article</title>
+    <style>
+        body {
+            background-image: linear-gradient(to right, #686868, #b3b3b3, #9f9f9f, #e1e1e1, #757575, #808080, #afafaf, #9a9a9a, #757575, #8a8a8a, #adadad, #5b5b5b);
+            font-family: cursive;
+            font-size: 80%;
+            font-style: italic;
+            font-weight: 600;
+        }
+        
+        th {
+            /* background-color: rgb(55, 55, 55); */
+            background-image: linear-gradient(to top, #626262, #a6a6a6, #5d5d5d);
+            color: rgb(0, 0, 0);
+        }
+        
+        table {
+            background-image: linear-gradient(to top, #7f7f7f, #cdcdcd, #7a7a7a);
+        }
+        
+        input {
+            width: 340px;
+            margin-bottom: 10px;
+        }
+        
+        h3, h2,p {
+            text-align: center;
+        }
+        
+        hr {
+            width: 30%;
+        }
+    </style>
+    <!-- step 1: jQuery CDN to the project-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body onload="dataset()">
+    <p id="locs"></p>
+    <script>
+        function dataset() {
+        //Create the XHR object
+        var xhttp = new XMLHttpRequest();
+        //Open the file
+        xhttp.open("GET", "dataset_r.xml", false);
+        //Send the request
+        xhttp.send();
+        // Read data
+        xmlData = xhttp.responseXML;
+            
+        output = "<h2>"+xmlData.getElementsByTagName("title")[0].innerHTML + "</h2>";
+        output += "<h3>"+xmlData.getElementsByTagName("subtitle")[0].innerHTML + "</h3>";
+        output += "<p>Last Updated: "+ new Date(xmlData.getElementsByTagName("updated")[0].innerHTML) + "</p><br><br>";
+
+        output += "<table border ='1'>";
+        output += "<tr>";
+        output += "<th rowspan ='2'>Sr.No</th>";    
+        output += "<th colspan = '2'>Author</th>";
+        output += "<th rowspan ='2'>Category</th>";
+        output += "<th rowspan ='2'>Content</th>";
+        output += "<th rowspan ='2'>ID</th>";
+        output += "<th rowspan ='2'>Link</th>";
+        output += "<th rowspan ='2'>Last Update</th>";
+        output += "<th rowspan ='2'>Title</th>";
+        output += "</tr>";
+
+        output += "<tr>";
+        output += "<th>name</th>";
+        output += "<th>Uri</th>";
+        output += "</tr>";
+
+        var entries = xmlData.getElementsByTagName("entry");
+        for(let i =0; i< entries.length;i++){
+            output += "<tr>";
+            output += "<td>" + (i+1) + "</td>";
+            output += "<td>" + entries[i].getElementsByTagName("author")[0].children[0].innerHTML + "</td>";
+            var uri = entries[i].getElementsByTagName("author")[0].children[1].innerHTML;
+            output += "<td><a href='"+uri+"'>"+uri+"</a></td>";
+            output += "<td>" + entries[i].getElementsByTagName("category")[0].getAttribute("label") + "</td>";
+            output += "<td>" + $(entries[i]).find("content").text(); + "</td>";
+            output += "<td>" + entries[i].getElementsByTagName("id")[0].innerHTML + "</td>";
+            var link = entries[i].getElementsByTagName("link")[0].getAttribute("href");
+            output += "<td><a href='"+link+"'>"+link+"</a></td>";
+            output += "<td>" + entries[i].getElementsByTagName("published")[0].innerHTML + "</td>";
+            output += "<td>" + entries[i].getElementsByTagName("title")[0].innerHTML + "</td>";
+            output += "</tr>";
+        }
+        document.getElementById("locs").innerHTML = output;
+
+        console.log(xmlData);
+        }
+    </script>
+</body>
+
+</html>

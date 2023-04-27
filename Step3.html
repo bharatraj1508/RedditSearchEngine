@@ -1,0 +1,175 @@
+<!--
+/*********************************************************************************
+* ITC5202 – Project
+* I declare that this assignment is my own work in accordance with Humber Academic Policy. 
+* No part of this assignment has been copied manually or electronically from any other source
+* (including web sites) or distributed to other students.
+* 
+* Group member Name: Bharat Raj Verma, Sanath Tulli Student IDs: N01510841, N01473612 Date: 8/8/2022
+*
+*
+********************************************************************************/
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 3</title>
+    <style>
+        body {
+            background-image: linear-gradient(to right, #686868, #b3b3b3, #9f9f9f, #e1e1e1, #757575, #808080, #afafaf, #dedede, #757575, #8a8a8a, #adadad, #5b5b5b);
+            font-family: cursive;
+            font-size: 90%;
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        th {
+            background-image: linear-gradient(to top, #626262, #a6a6a6, #5d5d5d);
+            color: rgb(0, 0, 0);
+        }
+
+        table {
+            background-image: linear-gradient(to top, #7f7f7f, #cdcdcd, #7a7a7a);
+        }
+
+        input {
+            width: 340px;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            text-align: center;
+        }
+
+        hr {
+            width: 30%;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <h3>
+        <hr>
+        <label for="search">Search</label><br>
+        <input type="text" id="search" name="search"><br>
+        <input type="submit" value="Submit" id="searchButton">
+        <hr>
+    </h3>
+    <p id="searchResult"></p>
+    <script>
+        $(document).ready(function () {
+            $('#searchButton').click(function () {
+
+                if (!$("#search").val()) {
+                    alert("Please enter search item");
+                    return false;
+                }
+                else {
+                    var value = $("#search").val();
+                }
+                fetch(`https://www.reddit.com/subreddits/search.json?q=${value}&limit=3`)
+                    .then(res => {
+                        return res.json();
+                    })
+                    .then(function (data) {
+                        var count = 0;
+                        var count2 = 0;
+                        var countForArray = -1;
+                        const arr = new Array(9);
+                        for (let j = 0; j < 3; j++) {
+                            var x = -1;
+                            var output2 = "";
+                            var subredditName = data.data.children[j].data.display_name;
+                            fetch(`https://www.reddit.com/r/${subredditName}/top/.json?t=all&limit=3`)
+                                .then(res => {
+                                    return res.json();
+                                })
+                                .then(function (d) {
+                                    for (let i = 0; i < 3; i++) {
+                                        var output = "<tr>";
+                                        if (i == 0) {
+                                            output += "<td rowspan='9'>" + data.data.children[j].data.display_name_prefixed + "</td>";
+                                        }
+                                        output += "<td rowspan='3'>" + d.data.children[i].data.title + "</td>";
+                                        output += "<td rowspan='3'>" + d.data.children[i].data.author_fullname + "</td>";
+                                        output += "<td rowspan='3'>" + d.data.children[i].data.score + "</td>";
+
+                                        if (d.data.children[i].data.thumbnail == "") {
+                                            output += "<td rowspan='3'><img src='https://cdn.comparitech.com/wp-content/uploads/2017/08/reddit-1.jpg' width='100' height='100'></td>";
+                                        }
+                                        else {
+                                            output += "<td rowspan='3'><img src='" + d.data.children[i].data.thumbnail + "' width='100' height='100'></td>";
+                                        }
+                                        if (d.data.children[i].data.link_flair_text == "") {
+                                            output += "<td rowspan='3'><img src='https://cdn.comparitech.com/wp-content/uploads/2017/08/reddit-1.jpg' width='100' height='100'></td>";
+                                        }
+                                        else {
+                                            output += "<td rowspan='3'>" + d.data.children[i].data.link_flair_text + "</td>";
+                                        }
+                                        countForArray++;
+                                        arr[countForArray] = output;
+
+                                        fetch(`https://www.reddit.com${d.data.children[i].data.permalink}.json?sort=top`)
+                                            .then(res => {
+                                                return res.json();
+                                            })
+                                            .then(function (moreData) {
+                                                if (x == -1) {
+                                                    output2 = "<table border='1'> ";
+                                                    output2 += "<tr>";
+                                                    output2 += "<th>" + "Sub-Reddit Name" + "</th>";
+                                                    output2 += "<th>" + "Title" + "</th>";
+                                                    output2 += "<th>" + "Author" + "</th>";
+                                                    output2 += "<th>" + "Score" + "</th>";
+                                                    output2 += "<th>" + "Images" + "</th>";
+                                                    output2 += "<th>" + "Flair" + "</th>";
+                                                    output2 += "<th>" + "Comments" + "</th>";
+                                                    output2 += "<th>" + "Author" + "</th>";
+                                                    output2 += "</tr>";
+                                                }
+                                                x++;
+                                                output2 += arr[x];
+
+                                                var md = moreData[1].data.children
+                                                for (let k = 0; k < 3; k++) {
+                                                    if (md[k].data.body == "") {
+                                                        output2 += "<td><img src='https://cdn.comparitech.com/wp-content/uploads/2017/08/reddit-1.jpg' width='100' height='100'></td>";
+                                                    }
+                                                    else {
+                                                        output2 += "<td>" + md[k].data.body + "</td>";
+                                                    }
+                                                    if (md[k].data.author_fullname == "") {
+                                                        output2 += "<td><img src='https://cdn.comparitech.com/wp-content/uploads/2017/08/reddit-1.jpg' width='100' height='100'></td>";
+                                                    }
+                                                    else {
+                                                        output2 += "<td>" + md[k].data.author_fullname + "</td>";
+                                                    }
+
+                                                    output2 += "</tr>";
+                                                    count2++;
+                                                }
+                                                if (x == 8) {
+                                                    output2 += "</table>";
+                                                    document.getElementById("searchResult").innerHTML = output2;
+                                                }
+
+                                            });
+                                        count++;
+                                        if (count == 9) {
+
+                                        }
+                                    }
+                                });
+                        }
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>
